@@ -3,9 +3,12 @@ import time
 import os
 
 def save_data(tasks, exp, lvl):
-    data = {'tasks': tasks, 'exp': exp, 'lvl': lvl}
-    with open('todo_data.json', 'w') as file:
-        json.dump(data, file, indent=4)
+    try:
+        data = {'tasks': tasks, 'exp': exp, 'lvl': lvl}
+        with open('todo_data.json', 'w') as file:
+            json.dump(data, file, indent=4)
+    except Exception as e:
+        print(f"Error saving data: {e}")
 
 def load_data():
     try:
@@ -16,8 +19,11 @@ def load_data():
         return [], 0, 1  # Retorna valores predeterminados si el archivo no existe
 
 # Al iniciar la aplicación, cargamos los datos
-tasks, exp, lvl = load_data()
-
+try:
+    tasks, exp, lvl = load_data()
+except Exception as e:
+    print(f"Error loading data: {e}")
+    tasks, exp, lvl = [], 0, 1
 
 class TaskList:
     def __init__(self):
@@ -26,44 +32,57 @@ class TaskList:
         self.level = 1  # Nivel inicial
 
     def add_task(self, task):
-        self.tasks.append({"task": task, "completed": False})
-        print(f"Tarea '{task}' agregada.")
-        save_data(self.tasks, self.exp, self.level)
-        time.sleep(3)
-        os.system('cls')
+        try:
+            self.tasks.append({"task": task, "completed": False})
+            print(f"Tarea '{task}' agregada.")
+            save_data(self.tasks, self.exp, self.level)
+            time.sleep(3)
+            os.system('cls')
+        except Exception as e:
+            print(f"Error agregando tarea: {e}")
 
     def complete_task(self, task_index):
-        if 0 <= task_index < len(self.tasks) and not self.tasks[task_index]["completed"]:
-            self.tasks[task_index]["completed"] = True
-            self.exp += 10  # Añade 10 EXP por tarea completada
-            print(f"Tarea '{self.tasks[task_index]['task']}' completada.")
-            self.check_level_up()
-            self.tasks.pop(task_index)
-            save_data(self.tasks, self.exp, self.level)
-            time.sleep(3)
-            os.system('cls')
-        else:
-            print("Índice de tarea inválido o tarea ya completada.")
-
+        try:
+            if 0 <= task_index < len(self.tasks) and not self.tasks[task_index]["completed"]:
+                self.tasks[task_index]["completed"] = True
+                self.exp += 10  # Añade 10 EXP por tarea completada
+                print(f"Tarea '{self.tasks[task_index]['task']}' completada.")
+                self.check_level_up()
+                self.tasks.pop(task_index)
+                save_data(self.tasks, self.exp, self.level)
+                time.sleep(3)
+                os.system('cls')
+            else:
+                print("Índice de tarea inválido o tarea ya completada.")
+        except Exception as e:
+            print(f"Error completando tarea: {e}")
+            
     def delete_task(self, task_index):
-        if 0 <= task_index < len(self.tasks):
-            deleted_task = self.tasks.pop(task_index)
-            print(f"Tarea '{deleted_task['task']}' eliminada.")
-            save_data(self.tasks, self.exp, self.level)
-            time.sleep(3)
-            os.system('cls')
-        else:
-            print("Índice de tarea inválido.")
+        try:
+            if 0 <= task_index < len(self.tasks):
+                deleted_task = self.tasks.pop(task_index)
+                print(f"Tarea '{deleted_task['task']}' eliminada.")
+                save_data(self.tasks, self.exp, self.level)
+                time.sleep(3)
+                os.system('cls')
+            else:
+                print("Índice de tarea inválido.")
+        except Exception as e:
+            print(f"Error borrando tarea: {e}")
+
 
     def check_level_up(self):
-        if self.exp >= 100:
-            self.exp -= 100  # Resta 100 EXP y sube de nivel
-            self.level += 1
-            print(f"Felicidades! Has subido al nivel {self.level}.")
-            save_data(self.tasks, self.exp, self.level)
-            time.sleep(3)
-            os.system('cls')
-
+        try:
+            if self.exp >= 100:
+                self.exp -= 100  # Resta 100 EXP y sube de nivel
+                self.level += 1
+                print(f"Felicidades! Has subido al nivel {self.level}.")
+                save_data(self.tasks, self.exp, self.level)
+                time.sleep(3)
+                os.system('cls')
+        except Exception as e:
+            print(f"Error subiendo de nivel: {e}")
+            
     def show_tasks(self):
         if self.tasks:
             for i, task in enumerate(self.tasks):
@@ -72,7 +91,7 @@ class TaskList:
             print("No hay tareas pendientes.")
 
     def show_status(self):
-        print(f"\nNivel: {self.level}, EXP: {self.exp}/100")
+        print(f"\n--- Nivel: {self.level} ---\n--- EXP: {self.exp}/100 ---")
 
 # Función principal para ejecutar la aplicación
 def main():
