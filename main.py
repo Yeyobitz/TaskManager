@@ -1,5 +1,6 @@
 import json
 import time
+import os
 
 def save_data(tasks, exp, lvl):
     data = {'tasks': tasks, 'exp': exp, 'lvl': lvl}
@@ -28,6 +29,8 @@ class TaskList:
         self.tasks.append({"task": task, "completed": False})
         print(f"Tarea '{task}' agregada.")
         save_data(self.tasks, self.exp, self.level)
+        time.sleep(3)
+        os.system('cls')
 
     def complete_task(self, task_index):
         if 0 <= task_index < len(self.tasks) and not self.tasks[task_index]["completed"]:
@@ -35,7 +38,10 @@ class TaskList:
             self.exp += 10  # Añade 10 EXP por tarea completada
             print(f"Tarea '{self.tasks[task_index]['task']}' completada.")
             self.check_level_up()
+            self.tasks.pop(task_index)
             save_data(self.tasks, self.exp, self.level)
+            time.sleep(3)
+            os.system('cls')
         else:
             print("Índice de tarea inválido o tarea ya completada.")
 
@@ -44,6 +50,8 @@ class TaskList:
             deleted_task = self.tasks.pop(task_index)
             print(f"Tarea '{deleted_task['task']}' eliminada.")
             save_data(self.tasks, self.exp, self.level)
+            time.sleep(3)
+            os.system('cls')
         else:
             print("Índice de tarea inválido.")
 
@@ -52,17 +60,19 @@ class TaskList:
             self.exp -= 100  # Resta 100 EXP y sube de nivel
             self.level += 1
             print(f"Felicidades! Has subido al nivel {self.level}.")
+            save_data(self.tasks, self.exp, self.level)
+            time.sleep(3)
+            os.system('cls')
 
     def show_tasks(self):
         if self.tasks:
             for i, task in enumerate(self.tasks):
-                status = "Completada" if task["completed"] else "Pendiente"
-                print(f"{i}. {task['task']} - {status}")
+                print(f"{i}. {task['task'].upper()}")
         else:
             print("No hay tareas pendientes.")
 
     def show_status(self):
-        print(f"Nivel: {self.level}, EXP: {self.exp}/100")
+        print(f"\nNivel: {self.level}, EXP: {self.exp}/100")
 
 # Función principal para ejecutar la aplicación
 def main():
@@ -73,10 +83,10 @@ def main():
     task_list.level = lvl
     
     while True:
-        print("\n--- Lista de Tareas ---")
+        print("\n--- Lista de Tareas ---\n")
         task_list.show_tasks()
         task_list.show_status()
-        print("1. Agregar tarea\n2. Completar tarea\n3. Eliminar tarea\n4. Salir")
+        print("\n1. Agregar tarea\n2. Completar tarea\n3. Eliminar tarea\n4. Salir")
         choice = input("Elige una opción: ")
 
         if choice == "1":
@@ -89,7 +99,7 @@ def main():
             task_index = int(input("Ingresa el índice de la tarea a eliminar: "))
             task_list.delete_task(task_index)
         elif choice == "4":
-            print("Saliendo de la aplicación.")
+            print("Bye bye.")
             break
         else:
             print("Opción no válida.")
